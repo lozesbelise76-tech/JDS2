@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JDS — La Méthode</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+:root{
+  --black:#03040a;
+  --deep:#06080f;
+  --card:#0a0d1a;
+  --card2:#0f1422;
+  --blue:#00d4ff;
+  --blue2:#38b6ff;
+  --blue3:#0099cc;
+  --blue-dim:rgba(0,212,255,.09);
+  --blue-border:rgba(0,212,255,.2);
+  --blue-glow:rgba(0,212,255,.4);
+  --red:#ff3b5c;
+  --red-dim:rgba(255,59,92,.10);
+  --text:#e4f4ff;
+  --muted:#3d5a72;
+  --border:rgba(0,212,255,.07);
+  --glass:rgba(8,15,35,.52);
+  --glass-border:rgba(0,212,255,.16);
+}
+
+body{
+  background:var(--black);
+  color:var(--text);
+  font-family:'Plus Jakarta Sans',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ══ CURSOR ══ */
+#c1{position:fixed;width:8px;height:8px;background:var(--blue);border-radius:50%;
+  pointer-events:none;z-index:9999;transform:translate(-50%,-50%);
+  box-shadow:0 0 10px var(--blue),0 0 24px rgba(0,212,255,.5);
+  transition:width .2s,height .2s;mix-blend-mode:screen;}
+#c2{position:fixed;width:34px;height:34px;border:1.5px solid rgba(0,212,255,.35);border-radius:50%;
+  pointer-events:none;z-index:9998;transform:translate(-50%,-50%);
+  transition:width .35s,height .35s,border-color .3s;}
+#c1.big{width:5px;height:5px;}
+#c2.big{width:52px;height:52px;border-color:rgba(0,212,255,.65);}
+
+/* ══ GRAIN ══ */
+body::after{content:'';position:fixed;inset:-200%;width:400%;height:400%;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.025;pointer-events:none;z-index:10000;
+  animation:grain .8s steps(2) infinite;}
+@keyframes grain{0%,100%{transform:translate(0,0)}10%{transform:translate(-2%,-3%)}30%{transform:translate(3%,2%)}50%{transform:translate(-1%,4%)}70%{transform:translate(4%,-1%)}90%{transform:translate(-3%,1%)}}
+
+/* ══ FLOATING ORBS ══ */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px);animation:orbF linear infinite;}
+.o1{width:600px;height:600px;background:rgba(0,212,255,.035);top:-150px;left:-150px;animation-duration:22s;}
+.o2{width:450px;height:450px;background:rgba(56,182,255,.045);bottom:-100px;right:-100px;animation-duration:28s;animation-direction:reverse;}
+.o3{width:350px;height:350px;background:rgba(0,153,204,.03);top:35%;left:45%;animation-duration:35s;}
+@keyframes orbF{0%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(50px,-40px) rotate(120deg)}66%{transform:translate(-35px,25px) rotate(240deg)}100%{transform:translate(0,0) rotate(360deg)}}
+
+/* ══ GLASS MIXIN ══ */
+.glass{
+  background:var(--glass);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid var(--glass-border);
+}
+.glass-sm{
+  background:rgba(8,14,32,.48);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(0,212,255,.13);
+}
+
+/* ══ HERO ══ */
+.hero{
+  min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% -5%, rgba(0,212,255,.08) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 35% at 85% 85%, rgba(56,182,255,.05) 0%, transparent 60%),
+    var(--black);
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,212,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,.04) 1px,transparent 1px);
+  background-size:72px 72px;
+  mask-image:radial-gradient(ellipse 90% 85% at 50% 30%,black 0%,transparent 100%);
+  animation:gPulse 6s ease-in-out infinite;
+}
+@keyframes gPulse{0%,100%{opacity:.5}50%{opacity:1}}
+.hero::before{
+  content:'';position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,var(--blue) 50%,transparent 100%);
+  animation:scan 5s linear infinite;z-index:1;opacity:.25;
+}
+@keyframes scan{from{top:0%}to{top:100%}}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:26px 32px;position:relative;z-index:3;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:.08em;color:var(--blue);
+  text-shadow:0 0 20px rgba(0,212,255,.5);}
+.nav-pill{
+  background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:99px;
+  padding:10px 24px;
+  font-size:.82rem;font-weight:700;letter-spacing:.04em;color:var(--blue);
+  text-decoration:none;transition:background .2s,box-shadow .2s;
+}
+.nav-pill:hover{background:rgba(0,212,255,.12);box-shadow:0 0 20px rgba(0,212,255,.2);}
+
+.hero-main{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;
+  padding:40px 24px;position:relative;z-index:2;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:99px;
+  padding:8px 20px;font-size:.72rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--blue);
+  margin-bottom:36px;
+  animation:fadeD .6s ease both;
+}
+.epulse{width:6px;height:6px;background:var(--blue);border-radius:50%;
+  animation:pulse 2s infinite;box-shadow:0 0 6px var(--blue);}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.6)}}
+@keyframes fadeD{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+
+.hero-h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3.6rem,15vw,8.5rem);
+  line-height:.9;letter-spacing:.01em;margin-bottom:30px;
+  animation:heroUp .9s .1s cubic-bezier(.16,1,.3,1) both;
+}
+.h1a{display:block;}
+.h1b{
+  display:block;color:var(--blue);
+  text-shadow:0 0 40px rgba(0,212,255,.6),0 0 80px rgba(0,212,255,.3);
+  animation:blueFlicker 3s ease-in-out infinite 1s;
+}
+@keyframes blueFlicker{0%,100%{text-shadow:0 0 40px rgba(0,212,255,.6),0 0 80px rgba(0,212,255,.3)}50%{text-shadow:0 0 60px rgba(0,212,255,.9),0 0 120px rgba(0,212,255,.5),0 0 200px rgba(0,212,255,.2)}}
+.h1c{
+  display:block;
+  -webkit-text-stroke:1.5px rgba(0,212,255,.3);color:transparent;
+}
+@keyframes heroUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:none}}
+
+.hero-sub{
+  font-size:1.05rem;color:var(--muted);max-width:430px;line-height:1.7;
+  margin-bottom:44px;font-weight:400;
+  animation:heroUp .9s .2s cubic-bezier(.16,1,.3,1) both;
+}
+
+.hero-ctas{
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  animation:heroUp .9s .3s cubic-bezier(.16,1,.3,1) both;
+}
+.btn-blue{
+  display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:#020810;font-family:'Plus Jakarta Sans',sans-serif;
+  font-weight:800;font-size:1rem;padding:17px 36px;border-radius:14px;
+  text-decoration:none;border:none;letter-spacing:-.01em;
+  transition:transform .2s,box-shadow .2s;
+  box-shadow:0 0 30px rgba(0,212,255,.35);
+}
+.btn-blue:hover{transform:scale(1.03) translateY(-2px);box-shadow:0 0 60px rgba(0,212,255,.55),0 16px 40px rgba(0,212,255,.25);}
+.barr{transition:transform .2s;}
+.btn-blue:hover .barr{transform:translateX(4px);}
+
+.htrust{display:flex;gap:24px;font-size:.81rem;color:var(--muted);flex-wrap:wrap;justify-content:center;}
+.htrust span::before{content:'✓ ';color:var(--blue);}
+
+.hero-stats{
+  display:flex;border-top:1px solid var(--border);position:relative;z-index:2;
+  background:rgba(3,4,10,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.hst{flex:1;padding:22px;text-align:center;border-right:1px solid var(--border);}
+.hst:last-child{border-right:none;}
+.hst-n{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.04em;color:var(--blue);
+  text-shadow:0 0 16px rgba(0,212,255,.5);}
+.hst-l{font-size:.7rem;color:var(--muted);margin-top:3px;letter-spacing:.05em;text-transform:uppercase;}
+
+/* ══ SHARED ══ */
+.wrap{max-width:700px;margin:0 auto;padding:0 24px;}
+.sec{padding:100px 0;}
+.sec-d{padding:100px 0;background:var(--deep);}
+hr.div{border:none;border-top:1px solid var(--border);margin:0 24px;}
+
+.gbadge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--blue-dim);border:1px solid var(--blue-border);
+  border-radius:99px;padding:7px 18px;
+  font-size:.7rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--blue);
+}
+.bigtitle{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.6rem,7vw,4.2rem);line-height:.97;
+  margin:18px 0 20px;letter-spacing:.02em;
+}
+.bodytxt{color:var(--muted);line-height:1.75;font-size:.97rem;}
+
+/* ══ PROBLEM ══ */
+.probs{display:flex;flex-direction:column;margin-top:48px;}
+.prob{
+  display:flex;align-items:center;gap:20px;
+  padding:22px 0;border-bottom:1px solid var(--border);
+  font-size:1.02rem;font-weight:500;color:rgba(228,244,255,.55);
+  transition:color .25s;
+}
+.prob:hover{color:var(--text);}
+.pnum{font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.08em;color:var(--muted);min-width:28px;}
+.px{
+  margin-left:auto;width:30px;height:30px;
+  background:var(--red-dim);border:1px solid rgba(255,59,92,.2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;color:var(--red);flex-shrink:0;
+}
+
+/* ══ SOLUTION ══ */
+.chks{display:flex;flex-direction:column;margin-top:48px;}
+.chk{display:flex;align-items:flex-start;gap:20px;padding:24px 0;border-bottom:1px solid var(--border);}
+.cbul{
+  width:22px;height:22px;border:1.5px solid var(--blue);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.62rem;color:var(--blue);flex-shrink:0;margin-top:3px;
+}
+.chk h4{font-weight:700;font-size:.97rem;margin-bottom:4px;}
+.chk p{color:var(--muted);font-size:.86rem;}
+
+/* ══ MODULES ══ */
+.mods{display:flex;flex-direction:column;gap:10px;margin-top:48px;}
+.mod{
+  border-radius:16px;padding:22px 24px;
+  display:flex;gap:20px;align-items:flex-start;
+  transition:transform .2s,box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.mod::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--blue),var(--blue2));
+  transform:scaleY(0);transform-origin:bottom;transition:transform .3s;
+}
+.mod:hover{transform:translateX(4px);box-shadow:0 0 30px rgba(0,212,255,.07);}
+.mod:hover::before{transform:scaleY(1);}
+.mnum{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;line-height:1;color:var(--blue);min-width:36px;opacity:.5;}
+.mod h4{font-weight:700;font-size:.97rem;margin-bottom:4px;}
+.mod p{color:var(--muted);font-size:.86rem;line-height:1.5;}
+
+/* ══ WHO ══ */
+.who-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:48px;}
+@media(min-width:600px){.who-grid{grid-template-columns:1fr 1fr;}}
+.who-box{border-radius:18px;padding:28px;}
+.wy{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);}
+.wn{background:var(--red-dim);border:1px solid rgba(255,59,92,.14);}
+.who-t{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.05em;
+  margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.wdot{width:8px;height:8px;border-radius:50%;}
+.wi-list{display:flex;flex-direction:column;gap:12px;}
+.wi{display:flex;align-items:flex-start;gap:12px;font-size:.92rem;line-height:1.45;}
+.wm{font-size:.78rem;margin-top:2px;flex-shrink:0;}
+
+/* ══ FORMAT ══ */
+.fmts{display:flex;flex-direction:column;margin-top:48px;}
+.fmt{
+  display:flex;align-items:center;gap:18px;
+  padding:18px 0;border-bottom:1px solid var(--border);
+  font-weight:600;font-size:.95rem;transition:color .2s;
+}
+.fmt:hover{color:var(--blue);}
+.fmt-ic{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;flex-shrink:0;transition:background .2s,border-color .2s;
+}
+.fmt:hover .fmt-ic{background:rgba(0,212,255,.12) !important;border-color:rgba(0,212,255,.25) !important;}
+
+/* ══ CAROUSELS SECTION ══ */
+.carousel-section{padding:100px 0;overflow:hidden;background:var(--deep);}
+.carousel-section .wrap{overflow:visible;}
+
+.track-wrap{
+  position:relative;overflow:hidden;
+  margin:0 -24px;
+}
+.track-wrap::before,
+.track-wrap::after{
+  content:'';position:absolute;top:0;bottom:0;width:120px;z-index:4;pointer-events:none;
+}
+.track-wrap::before{left:0;background:linear-gradient(90deg,var(--deep),transparent);}
+.track-wrap::after{right:0;background:linear-gradient(-90deg,var(--deep),transparent);}
+
+.track{
+  display:flex;gap:16px;
+  width:max-content;
+  animation:scroll var(--dur,40s) linear infinite;
+  padding:8px 24px;
+}
+.track:hover{animation-play-state:paused;}
+.track.rev{animation-direction:reverse;}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── REVIEW CARD ── */
+.rv{
+  width:280px;flex-shrink:0;
+  border-radius:18px;padding:20px;
+  background:rgba(8,14,32,.6);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(0,212,255,.12);
+  transition:border-color .25s,transform .25s,box-shadow .25s;
+  cursor:default;
+}
+.rv:hover{
+  border-color:rgba(0,212,255,.35);
+  transform:translateY(-4px);
+  box-shadow:0 12px 40px rgba(0,212,255,.1);
+}
+.rv-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.rv-av{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;
+  color:#020810;font-weight:800;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  box-shadow:0 0 12px rgba(0,212,255,.35);
+}
+.rv-name{font-weight:700;font-size:.9rem;margin-bottom:2px;}
+.rv-earn{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--blue);letter-spacing:.04em;}
+.rv-stars{color:var(--blue);font-size:.8rem;letter-spacing:2px;margin-bottom:10px;opacity:.8;}
+.rv-txt{font-size:.82rem;color:rgba(228,244,255,.55);line-height:1.5;}
+
+.carousel-gap{height:20px;}
+
+/* ══ GUARANTEE ══ */
+.guar-wrap{max-width:680px;margin:0 auto;padding:0 24px;}
+.guar{
+  border-radius:24px;padding:52px 36px;text-align:center;position:relative;overflow:hidden;
+}
+.guar::before{
+  content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(0,212,255,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.guar-ic{font-size:3rem;display:block;margin-bottom:22px;
+  filter:drop-shadow(0 0 16px rgba(0,212,255,.4));
+  animation:glow 2s ease-in-out infinite;}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 10px rgba(0,212,255,.3))}50%{filter:drop-shadow(0 0 24px rgba(0,212,255,.7))}}
+.guar h3{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:.04em;margin-bottom:18px;}
+.guar p{color:var(--muted);line-height:1.75;max-width:480px;margin:0 auto;}
+
+/* ══ PRICING ══ */
+.price-sec{padding:100px 24px;max-width:540px;margin:0 auto;}
+.pcard{border-radius:24px;overflow:hidden;position:relative;}
+.pcard::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(0,212,255,.06),transparent 60%);
+  pointer-events:none;z-index:0;
+}
+.ptop{
+  padding:40px 32px 28px;border-bottom:1px solid var(--border);
+  text-align:center;position:relative;z-index:1;
+}
+.ltag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,59,92,.12);border:1px solid rgba(255,59,92,.25);
+  color:#ff7b7b;border-radius:6px;padding:7px 16px;
+  font-size:.73rem;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;margin-bottom:28px;
+}
+.prow{display:flex;align-items:baseline;justify-content:center;gap:14px;margin-bottom:10px;}
+.pold{font-size:1.3rem;color:var(--muted);text-decoration:line-through;}
+.pnew{
+  font-family:'Bebas Neue',sans-serif;font-size:4.5rem;
+  letter-spacing:.02em;color:var(--blue);
+  text-shadow:0 0 30px rgba(0,212,255,.5);
+}
+.stars-r{font-size:1rem;letter-spacing:3px;color:var(--blue);margin-bottom:6px;opacity:.8;}
+.pstu{font-size:.85rem;color:var(--muted);}
+.pstu strong{color:var(--text);}
+
+.pbody{padding:28px 32px 36px;position:relative;z-index:1;}
+.pcta{
+  display:block;width:100%;
+  background:linear-gradient(135deg,var(--blue),var(--blue2));
+  color:#020810;font-family:'Plus Jakarta Sans',sans-serif;
+  font-weight:800;font-size:1.05rem;
+  padding:18px;border-radius:12px;border:none;
+  text-align:center;text-decoration:none;
+  transition:transform .2s,box-shadow .2s;margin-bottom:18px;
+  letter-spacing:-.01em;box-shadow:0 0 30px rgba(0,212,255,.3);
+}
+.pcta:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(0,212,255,.5),0 14px 40px rgba(0,212,255,.2);}
+.trust-r{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;}
+.ti{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted);}
+
+/* ══ FAQ ══ */
+.faq-sec{padding:100px 0;}
+.flist{margin-top:48px;}
+.faq{border-bottom:1px solid var(--border);}
+.fqbtn{
+  width:100%;background:none;border:none;color:var(--text);
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.97rem;font-weight:700;
+  padding:22px 0;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:20px;
+}
+.fqic{
+  width:28px;height:28px;border:1px solid var(--border);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;font-size:1rem;color:var(--muted);
+  transition:transform .3s,border-color .3s,color .3s;
+}
+.faq.open .fqic{transform:rotate(45deg);border-color:var(--blue);color:var(--blue);}
+.faqa{
+  max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;
+  color:var(--muted);font-size:.92rem;line-height:1.75;
+}
+.faq.open .faqa{max-height:220px;padding-bottom:22px;}
+
+/* ══ FOOTER ══ */
+footer{
+  border-top:1px solid var(--border);padding:36px 24px;
+  text-align:center;font-size:.8rem;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.flogo{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--blue);letter-spacing:.08em;
+  text-shadow:0 0 16px rgba(0,212,255,.4);}
+
+/* ══ SCROLL REVEAL ══ */
+.rev{opacity:0;transform:translateY(32px);transition:opacity .8s ease,transform .8s ease;}
+.rev.in{opacity:1;transform:none;}
+.rev-l{opacity:0;transform:translateX(-30px);transition:opacity .8s ease,transform .8s ease;}
+.rev-l.in{opacity:1;transform:none;}
+.rev-r{opacity:0;transform:translateX(30px);transition:opacity .8s ease,transform .8s ease;}
+.rev-r.in{opacity:1;transform:none;}
+.stg>*{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .55s ease;}
+.stg.in>*:nth-child(1){transition-delay:0s}
+.stg.in>*:nth-child(2){transition-delay:.08s}
+.stg.in>*:nth-child(3){transition-delay:.16s}
+.stg.in>*:nth-child(4){transition-delay:.24s}
+.stg.in>*:nth-child(5){transition-delay:.32s}
+.stg.in>*:nth-child(6){transition-delay:.4s}
+.stg.in>*{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div class="orb o3"></div>
+<div id="c1"></div>
+<div id="c2"></div>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <nav>
+    <div class="logo">JDS</div>
+    <a href="#pricing" class="nav-pill">Accéder →</a>
+  </nav>
+  <div class="hero-main">
+    <div class="eyebrow"><span class="epulse"></span>Formation Marketing Digital</div>
+    <h1 class="hero-h1">
+      <span class="h1a">J'ai 15 ans.</span>
+      <span class="h1b">50k€</span>
+      <span class="h1c">en 4 mois.</span>
+    </h1>
+    <p class="hero-sub">La méthode step by step que j'aurais voulu avoir quand j'ai commencé. Zéro théorie inutile, 100% actionnable.</p>
+    <div class="hero-ctas">
+      <a href="#pricing" class="btn-blue">Je veux apprendre la méthode <span class="barr">→</span></a>
+      <div class="htrust">
+        <span>Sans bullshit</span>
+        <span>Méthode claire</span>
+        <span>Résultats concrets</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="hst"><div class="hst-n">50K€</div><div class="hst-l">Générés en 4 mois</div></div>
+    <div class="hst"><div class="hst-n">361</div><div class="hst-l">Élèves inscrits</div></div>
+    <div class="hst"><div class="hst-n">30J</div><div class="hst-l">Garantie remboursement</div></div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ══ PROBLEM ══ -->
+<section class="sec">
+  <div class="wrap rev">
+    <span class="gbadge">Le problème</span>
+    <h2 class="bigtitle">POURQUOI LA MAJORITÉ N'Y ARRIVE PAS ?</h2>
+    <p class="bodytxt">Tu as essayé, tu t'es formé, mais tu tournes en rond. Ce n'est pas un manque de volonté. C'est un manque de cadre.</p>
+    <div class="probs stg">
+      <div class="prob"><span class="pnum">01</span>Trop d'informations, pas de structure<div class="px">✕</div></div>
+      <div class="prob"><span class="pnum">02</span>Aucune discipline ni plan clair<div class="px">✕</div></div>
+      <div class="prob"><span class="pnum">03</span>Peur de se lancer et de vendre<div class="px">✕</div></div>
+      <div class="prob"><span class="pnum">04</span>Abandon trop rapide<div class="px">✕</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ══ SOLUTION ══ -->
+<section class="sec-d">
+  <div class="wrap rev">
+    <span class="gbadge">La solution</span>
+    <h2 class="bigtitle">JDS : UN CADRE CLAIR POUR ENFIN AVANCER</h2>
+    <p class="bodytxt">JDS n'est pas une énième formation théorique. C'est un système complet qui te guide de A à Z pour créer un business digital qui génère des revenus.</p>
+    <div class="chks stg">
+      <div class="chk glass-sm" style="border-radius:14px;padding:18px 20px;margin-bottom:2px;"><div class="cbul">✓</div><div><h4>Une méthode structurée pas à pas</h4><p>Chaque étape est claire, ordonnée, et immédiatement applicable.</p></div></div>
+      <div class="chk glass-sm" style="border-radius:14px;padding:18px 20px;margin-bottom:2px;"><div class="cbul">✓</div><div><h4>Un apprentissage progressif et logique</h4><p>Tu construis les compétences dans le bon ordre.</p></div></div>
+      <div class="chk glass-sm" style="border-radius:14px;padding:18px 20px;margin-bottom:2px;"><div class="cbul">✓</div><div><h4>Une approche orientée action</h4><p>Chaque module se termine par une action concrète.</p></div></div>
+      <div class="chk glass-sm" style="border-radius:14px;padding:18px 20px;"><div class="cbul">✓</div><div><h4>Des résultats mesurables et concrets</h4><p>On suit ta progression avec des objectifs réels.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ══ MODULES ══ -->
+<section class="sec">
+  <div class="wrap rev">
+    <span class="gbadge">Programme</span>
+    <h2 class="bigtitle">CE QUE TU VAS APPRENDRE</h2>
+    <p class="bodytxt">Un programme complet qui couvre tout ce dont tu as besoin pour réussir.</p>
+    <div class="mods stg">
+      <div class="mod glass-sm"><span class="mnum">01</span><div><h4>Bases du marketing digital</h4><p>Comprendre les fondamentaux pour construire sur des bases solides.</p></div></div>
+      <div class="mod glass-sm"><span class="mnum">02</span><div><h4>Mindset & discipline</h4><p>Développer l'état d'esprit qui fait la différence sur le long terme.</p></div></div>
+      <div class="mod glass-sm"><span class="mnum">03</span><div><h4>Création d'une offre</h4><p>Concevoir une offre irrésistible que les gens veulent acheter.</p></div></div>
+      <div class="mod glass-sm"><span class="mnum">04</span><div><h4>Génération de trafic</h4><p>Attirer les bonnes personnes vers ton business de façon prévisible.</p></div></div>
+      <div class="mod glass-sm"><span class="mnum">05</span><div><h4>Passage à l'action</h4><p>Transformer la théorie en résultats concrets et mesurables.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ══ FOR WHO ══ -->
+<section class="sec-d">
+  <div class="wrap rev">
+    <span class="gbadge">À qui s'adresse JDS ?</span>
+    <h2 class="bigtitle">CETTE FORMATION N'EST PAS POUR TOUT LE MONDE</h2>
+    <div class="who-grid stg">
+      <div class="who-box wy glass">
+        <div class="who-t"><span class="wdot" style="background:var(--blue);box-shadow:0 0 8px var(--blue);"></span>Pour toi si…</div>
+        <div class="wi-list">
+          <div class="wi"><span class="wm" style="color:var(--blue)">✓</span>Débutants motivés qui veulent un cadre clair</div>
+          <div class="wi"><span class="wm" style="color:var(--blue)">✓</span>T'as entre 14 et 25 ans et tu veux tes premiers euros</div>
+          <div class="wi"><span class="wm" style="color:var(--blue)">✓</span>Discipliné mais perdu dans l'information</div>
+          <div class="wi"><span class="wm" style="color:var(--blue)">✓</span>Tu veux des résultats, pas du blabla</div>
+        </div>
+      </div>
+      <div class="who-box wn glass">
+        <div class="who-t"><span class="wdot" style="background:var(--red);"></span>Pas pour toi si…</div>
+        <div class="wi-list">
+          <div class="wi"><span class="wm" style="color:var(--red)">✕</span>Tu cherches de l'argent rapide sans effort</div>
+          <div class="wi"><span class="wm" style="color:var(--red)">✕</span>Tu ne passes jamais à l'action</div>
+          <div class="wi"><span class="wm" style="color:var(--red)">✕</span>Tu abandonnes à la moindre difficulté</div>
+          <div class="wi"><span class="wm" style="color:var(--red)">✕</span>Tu veux tout, tout de suite</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ══ FORMAT ══ -->
+<section class="sec">
+  <div class="wrap rev">
+    <span class="gbadge">Format</span>
+    <h2 class="bigtitle">FORMAT DE LA FORMATION</h2>
+    <p class="bodytxt">Une expérience d'apprentissage pensée pour ton succès.</p>
+    <div class="fmts stg">
+      <div class="fmt"><div class="fmt-ic glass-sm">🖥️</div>Modules vidéo structurés</div>
+      <div class="fmt"><div class="fmt-ic glass-sm">📶</div>Accès 100% en ligne sur tous tes appareils</div>
+      <div class="fmt"><div class="fmt-ic glass-sm">⏱️</div>Avance à ton rythme, sans pression</div>
+      <div class="fmt"><div class="fmt-ic glass-sm">🔄</div>Mises à jour incluses à vie</div>
+      <div class="fmt"><div class="fmt-ic glass-sm">🎧</div>Support disponible à tout moment</div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ══ 3 CAROUSELS ══ -->
+<section class="carousel-section">
+  <div class="wrap rev">
+    <span class="gbadge">Résultats</span>
+    <h2 class="bigtitle">ILS ONT DÉJÀ SAUTÉ LE PAS</h2>
+    <p class="bodytxt">Des résultats réels de nos 361 élèves. Pas des promesses.</p>
+  </div>
+
+  <div style="height:48px;"></div>
+
+  <!-- CAROUSEL 1 — left to right -->
+  <div class="track-wrap">
+    <div class="track" style="--dur:38s;" id="t1">
+      <div class="rv"><div class="rv-top"><div class="rv-av">E</div><div><div class="rv-name">Emma</div><div class="rv-earn">+3 500€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">1 mois seulement. Je n'aurais jamais cru gagner autant aussi vite avec mon premier produit.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">Y</div><div><div class="rv-name">Yanis</div><div class="rv-earn">+650€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">En automatique grâce aux tunnels. Je dors et l'argent rentre. C'est dingue.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">I</div><div><div class="rv-name">Inès</div><div class="rv-earn">+700€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le module 3 est une mine d'or. Je l'ai appliqué et les résultats ont été immédiats.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">R</div><div><div class="rv-name">Rayan</div><div class="rv-earn">+5 000€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">5k en 2 mois à peine. Junior ne ment pas sur les résultats possibles.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">S</div><div><div class="rv-name">Sofiane</div><div class="rv-earn">+4 500€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">J'ai tout suivi à la lettre. Chaque module, chaque action. Et ça marche.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">C</div><div><div class="rv-name">Chloé</div><div class="rv-earn">+1 200€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Dès la première semaine j'avais déjà rentabilisé mon investissement.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">T</div><div><div class="rv-name">Thomas</div><div class="rv-earn">+2 100€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">La clarté de la méthode est incroyable. Pas de bla bla, que de l'action.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">L</div><div><div class="rv-name">Léa</div><div class="rv-earn">+890€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Je suis débutante et j'ai quand même fait 890€ en 3 semaines. Wow.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">K</div><div><div class="rv-name">Karim</div><div class="rv-earn">+6 300€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Les tunnels de vente m'ont changé la vie. 6k sans courir après les clients.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">A</div><div><div class="rv-name">Amina</div><div class="rv-earn">+1 550€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le support de Junior répond vite et bien. Tu ne te sens jamais seul.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">B</div><div><div class="rv-name">Baptiste</div><div class="rv-earn">+3 800€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">J'avais peur de vendre. Le module mindset m'a complètement déblocqué.</div></div>
+      <!-- Duplicates for infinite loop -->
+      <div class="rv"><div class="rv-top"><div class="rv-av">E</div><div><div class="rv-name">Emma</div><div class="rv-earn">+3 500€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">1 mois seulement. Je n'aurais jamais cru gagner autant aussi vite avec mon premier produit.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">Y</div><div><div class="rv-name">Yanis</div><div class="rv-earn">+650€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">En automatique grâce aux tunnels. Je dors et l'argent rentre. C'est dingue.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">I</div><div><div class="rv-name">Inès</div><div class="rv-earn">+700€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le module 3 est une mine d'or. Je l'ai appliqué et les résultats ont été immédiats.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">R</div><div><div class="rv-name">Rayan</div><div class="rv-earn">+5 000€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">5k en 2 mois à peine. Junior ne ment pas sur les résultats possibles.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">S</div><div><div class="rv-name">Sofiane</div><div class="rv-earn">+4 500€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">J'ai tout suivi à la lettre. Chaque module, chaque action. Et ça marche.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">C</div><div><div class="rv-name">Chloé</div><div class="rv-earn">+1 200€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Dès la première semaine j'avais déjà rentabilisé mon investissement.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">T</div><div><div class="rv-name">Thomas</div><div class="rv-earn">+2 100€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">La clarté de la méthode est incroyable. Pas de bla bla, que de l'action.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">L</div><div><div class="rv-name">Léa</div><div class="rv-earn">+890€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Je suis débutante et j'ai quand même fait 890€ en 3 semaines. Wow.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">K</div><div><div class="rv-name">Karim</div><div class="rv-earn">+6 300€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Les tunnels de vente m'ont changé la vie. 6k sans courir après les clients.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">A</div><div><div class="rv-name">Amina</div><div class="rv-earn">+1 550€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le support de Junior répond vite et bien. Tu ne te sens jamais seul.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">B</div><div><div class="rv-name">Baptiste</div><div class="rv-earn">+3 800€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">J'avais peur de vendre. Le module mindset m'a complètement déblocqué.</div></div>
+    </div>
+  </div>
+
+  <div class="carousel-gap"></div>
+
+  <!-- CAROUSEL 2 — right to left -->
+  <div class="track-wrap">
+    <div class="track rev" style="--dur:44s;">
+      <div class="rv"><div class="rv-top"><div class="rv-av">J</div><div><div class="rv-name">Jordan</div><div class="rv-earn">+7 200€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">7k en 4 mois. Je vis maintenant de mon business en ligne à 100%. Life changing.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">N</div><div><div class="rv-name">Nina</div><div class="rv-earn">+2 050€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Chaque euro investi dans JDS m'en a rapporté 20. ROI incroyable.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">M</div><div><div class="rv-name">Maxime</div><div class="rv-earn">+4 200€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Je recommande JDS à tous mes amis. La méthode est simple mais redoutablement efficace.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">F</div><div><div class="rv-name">Fatima</div><div class="rv-earn">+1 100€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Sans aucune expérience préalable. J'ai tout appris dans JDS et ça a fonctionné.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">G</div><div><div class="rv-name">Guillaume</div><div class="rv-earn">+8 500€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">8500€ c'est mon record mensuel. Et j'avance encore. Merci Junior.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">Z</div><div><div class="rv-name">Zoé</div><div class="rv-earn">+960€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le prix de 95€ m'a semblé risqué. Maintenant je rigole tellement c'était bon investissement.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">D</div><div><div class="rv-name">Damien</div><div class="rv-earn">+3 100€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">J'ai enfin un système qui tourne tout seul. Vente en automatique 24h/24.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">H</div><div><div class="rv-name">Hassan</div><div class="rv-earn">+1 700€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Les bases du marketing digital posées par JDS sont solides. Je comprends enfin.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">V</div><div><div class="rv-name">Victoire</div><div class="rv-earn">+2 400€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le passage à l'action est ce qui m'a le plus aidée. Stop la procrastination.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">O</div><div><div class="rv-name">Omar</div><div class="rv-earn">+5 900€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">5900€ de revenus passifs. Mon boss ne sait pas encore que je le quitte bientôt.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">P</div><div><div class="rv-name">Pauline</div><div class="rv-earn">+1 350€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">La formation évolue régulièrement. Junior ajoute du contenu, c'est top.</div></div>
+      <!-- Duplicates -->
+      <div class="rv"><div class="rv-top"><div class="rv-av">J</div><div><div class="rv-name">Jordan</div><div class="rv-earn">+7 200€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">7k en 4 mois. Je vis maintenant de mon business en ligne à 100%. Life changing.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">N</div><div><div class="rv-name">Nina</div><div class="rv-earn">+2 050€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Chaque euro investi dans JDS m'en a rapporté 20. ROI incroyable.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">M</div><div><div class="rv-name">Maxime</div><div class="rv-earn">+4 200€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Je recommande JDS à tous mes amis. La méthode est simple mais redoutablement efficace.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">F</div><div><div class="rv-name">Fatima</div><div class="rv-earn">+1 100€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Sans aucune expérience préalable. J'ai tout appris dans JDS et ça a fonctionné.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">G</div><div><div class="rv-name">Guillaume</div><div class="rv-earn">+8 500€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">8500€ c'est mon record mensuel. Et j'avance encore. Merci Junior.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">Z</div><div><div class="rv-name">Zoé</div><div class="rv-earn">+960€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le prix de 95€ m'a semblé risqué. Maintenant je rigole tellement c'était bon investissement.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">D</div><div><div class="rv-name">Damien</div><div class="rv-earn">+3 100€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">J'ai enfin un système qui tourne tout seul. Vente en automatique 24h/24.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">H</div><div><div class="rv-name">Hassan</div><div class="rv-earn">+1 700€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Les bases du marketing digital posées par JDS sont solides. Je comprends enfin.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">V</div><div><div class="rv-name">Victoire</div><div class="rv-earn">+2 400€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le passage à l'action est ce qui m'a le plus aidée. Stop la procrastination.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">O</div><div><div class="rv-name">Omar</div><div class="rv-earn">+5 900€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">5900€ de revenus passifs. Mon boss ne sait pas encore que je le quitte bientôt.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">P</div><div><div class="rv-name">Pauline</div><div class="rv-earn">+1 350€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">La formation évolue régulièrement. Junior ajoute du contenu, c'est top.</div></div>
+    </div>
+  </div>
+
+  <div class="carousel-gap"></div>
+
+  <!-- CAROUSEL 3 — left to right, slower -->
+  <div class="track-wrap">
+    <div class="track" style="--dur:50s;">
+      <div class="rv"><div class="rv-top"><div class="rv-av">X</div><div><div class="rv-name">Xavier</div><div class="rv-earn">+5 600€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">5.6k tout en étant au lycée. Oui c'est possible avec JDS si tu fais le travail.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">U</div><div><div class="rv-name">Ugo</div><div class="rv-earn">+1 750€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Premier 1k en 5 semaines. Puis les revenus ont explosé mois après mois.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">W</div><div><div class="rv-name">Walid</div><div class="rv-earn">+2 900€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le mindset que JDS m'a donné vaut plus que les euros gagnés. Transformateur.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">Q</div><div><div class="rv-name">Quentin</div><div class="rv-earn">+4 000€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Je vendais déjà un peu mais je plafonnais. JDS m'a débloqué. 4k ce mois-ci.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">M</div><div><div class="rv-name">Mariam</div><div class="rv-earn">+1 300€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">La communauté autour de JDS est super motivante. On avance tous ensemble.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">A</div><div><div class="rv-name">Antoine</div><div class="rv-earn">+3 350€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">J'aurais aimé avoir JDS 2 ans plus tôt. Ça m'aurait évité beaucoup d'erreurs.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">S</div><div><div class="rv-name">Sara</div><div class="rv-earn">+4 100€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Module par module, j'ai tout appliqué dans l'ordre. Et ça a fonctionné exactement comme prévu.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">R</div><div><div class="rv-name">Robin</div><div class="rv-earn">+690€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Petit budget de départ, grands résultats. JDS t'apprend à optimiser chaque euro.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">E</div><div><div class="rv-name">Elisa</div><div class="rv-earn">+1 800€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Ce que j'aime c'est que Junior est transparent sur tout. Pas de promesses en l'air.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">C</div><div><div class="rv-name">Camille</div><div class="rv-earn">+2 300€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">On peut revoir les modules autant de fois qu'on veut. Parfait pour bien assimiler.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">L</div><div><div class="rv-name">Lucas</div><div class="rv-earn">+2 700€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le passage à l'action est vraiment bien fait. Ça m'a sorti de ma procrastination définitivement.</div></div>
+      <!-- Duplicates -->
+      <div class="rv"><div class="rv-top"><div class="rv-av">X</div><div><div class="rv-name">Xavier</div><div class="rv-earn">+5 600€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">5.6k tout en étant au lycée. Oui c'est possible avec JDS si tu fais le travail.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">U</div><div><div class="rv-name">Ugo</div><div class="rv-earn">+1 750€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Premier 1k en 5 semaines. Puis les revenus ont explosé mois après mois.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">W</div><div><div class="rv-name">Walid</div><div class="rv-earn">+2 900€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le mindset que JDS m'a donné vaut plus que les euros gagnés. Transformateur.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">Q</div><div><div class="rv-name">Quentin</div><div class="rv-earn">+4 000€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Je vendais déjà un peu mais je plafonnais. JDS m'a débloqué. 4k ce mois-ci.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">M</div><div><div class="rv-name">Mariam</div><div class="rv-earn">+1 300€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">La communauté autour de JDS est super motivante. On avance tous ensemble.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">A</div><div><div class="rv-name">Antoine</div><div class="rv-earn">+3 350€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">J'aurais aimé avoir JDS 2 ans plus tôt. Ça m'aurait évité beaucoup d'erreurs.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">S</div><div><div class="rv-name">Sara</div><div class="rv-earn">+4 100€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Module par module, j'ai tout appliqué dans l'ordre. Et ça a fonctionné exactement comme prévu.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">R</div><div><div class="rv-name">Robin</div><div class="rv-earn">+690€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Petit budget de départ, grands résultats. JDS t'apprend à optimiser chaque euro.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">E</div><div><div class="rv-name">Elisa</div><div class="rv-earn">+1 800€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Ce que j'aime c'est que Junior est transparent sur tout. Pas de promesses en l'air.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">C</div><div><div class="rv-name">Camille</div><div class="rv-earn">+2 300€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">On peut revoir les modules autant de fois qu'on veut. Parfait pour bien assimiler.</div></div>
+      <div class="rv"><div class="rv-top"><div class="rv-av">L</div><div><div class="rv-name">Lucas</div><div class="rv-earn">+2 700€</div></div></div><div class="rv-stars">★★★★★</div><div class="rv-txt">Le passage à l'action est vraiment bien fait. Ça m'a sorti de ma procrastination définitivement.</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ══ GUARANTEE ══ -->
+<section class="sec">
+  <div class="guar-wrap rev">
+    <div class="guar glass">
+      <span class="guar-ic">🛡️</span>
+      <h3>GARANTIE 30 JOURS</h3>
+      <p>Tu as 30 jours après avoir commencé à créer du contenu pour voir des résultats. Si tu appliques tous les conseils de JDS et que ça ne marche pas, je te rembourse intégralement. Sans questions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRICING ══ -->
+<section class="price-sec rev" id="pricing">
+  <div style="text-align:center;margin-bottom:40px;">
+    <span class="gbadge">Rejoins JDS aujourd'hui</span>
+    <h2 class="bigtitle" style="margin-top:20px;margin-bottom:0;">ACCÈS COMPLET À LA MÉTHODE</h2>
+  </div>
+  <div class="pcard glass">
+    <div class="ptop">
+      <div class="ltag">🔥 Offre de lancement</div>
+      <div class="prow"><span class="pold">129€</span><span class="pnew">95€</span></div>
+      <div class="stars-r">★★★★★</div>
+      <p class="pstu"><strong>361 élèves</strong> déjà inscrits</p>
+    </div>
+    <div class="pbody">
+      <a href="#" class="pcta">Je veux apprendre la méthode →</a>
+      <div class="trust-r">
+        <div class="ti">🔒 Paiement sécurisé</div>
+        <div class="ti">⚡ Accès immédiat</div>
+        <div class="ti">🛡️ Garantie 30J</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ══ FAQ ══ -->
+<section class="faq-sec">
+  <div class="wrap rev">
+    <span class="gbadge">FAQ</span>
+    <h2 class="bigtitle" style="margin-top:20px;">QUESTIONS FRÉQUENTES</h2>
+    <div class="flist">
+      <div class="faq open">
+        <button class="fqbtn" onclick="tog(this)">C'est pour quel niveau ?<span class="fqic">+</span></button>
+        <div class="faqa">Débutant complet. T'as besoin de rien avant.</div>
+      </div>
+      <div class="faq">
+        <button class="fqbtn" onclick="tog(this)">En combien de temps je vois des résultats ?<span class="fqic">+</span></button>
+        <div class="faqa">En appliquant la méthode sérieusement, tu peux voir tes premiers résultats en 30 jours. Tout dépend de ton investissement personnel.</div>
+      </div>
+      <div class="faq">
+        <button class="fqbtn" onclick="tog(this)">C'est quoi exactement dans la formation ?<span class="fqic">+</span></button>
+        <div class="faqa">Des modules vidéo structurés couvrant les bases du marketing digital, la création d'offre, la génération de trafic, et le passage à l'action. Tout accessible à ton rythme.</div>
+      </div>
+      <div class="faq">
+        <button class="fqbtn" onclick="tog(this)">Pourquoi 95€ ?<span class="fqic">+</span></button>
+        <div class="faqa">C'est le prix de lancement. Il augmentera une fois les 50 premiers avis atteints. Rejoins maintenant pour le meilleur tarif.</div>
+      </div>
+      <div class="faq">
+        <button class="fqbtn" onclick="tog(this)">Je peux poser des questions après l'achat ?<span class="fqic">+</span></button>
+        <div class="faqa">Oui, le support est disponible. Tu peux poser toutes tes questions et l'équipe te répondra dans ton parcours.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FINAL CTA ══ -->
+<section style="padding:60px 24px 90px;text-align:center;" class="rev">
+  <a href="#pricing" class="btn-blue" style="display:inline-flex;">Rejoindre JDS maintenant <span class="barr">→</span></a>
+</section>
+
+<footer>
+  <div class="flogo">JDS</div>
+  <p>© 2025 JDS — Tous droits réservés</p>
+</footer>
+
+<script>
+// Dual cursor
+const c1=document.getElementById('c1'),c2=document.getElementById('c2');
+let mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;c1.style.left=mx+'px';c1.style.top=my+'px';});
+(function loop(){cx+=(mx-cx)*.12;cy+=(my-cy)*.12;c2.style.left=cx+'px';c2.style.top=cy+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{c1.classList.add('big');c2.classList.add('big');});
+  el.addEventListener('mouseleave',()=>{c1.classList.remove('big');c2.classList.remove('big');});
+});
+
+// FAQ
+function tog(btn){
+  const item=btn.parentElement;
+  document.querySelectorAll('.faq.open').forEach(f=>{if(f!==item)f.classList.remove('open');});
+  item.classList.toggle('open');
+}
+
+// Scroll reveal
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+},{threshold:.07});
+document.querySelectorAll('.rev,.stg,.rev-l,.rev-r').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
